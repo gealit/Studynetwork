@@ -129,4 +129,6 @@ dmypy.json
 .pyre/
 .idea
 
-/studynetwork/settings.py
+studynetwork/settings.py
+
+static/

@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.contrib import messages
 from django.http import HttpResponse
+
 from .models import Room, Topic, Message, User
 from .forms import RoomForm, UserForm, MyUserCreationForm
 
@@ -26,7 +27,6 @@ def loginPage(request):
 
         if user is not None:
             login(request, user)
-            user.is_active = True
             return redirect('home')
         else:
             messages.error(request, 'Username or password does not exist')
@@ -58,7 +58,7 @@ def registerPage(request):
 
 def home(request):
     q = request.GET.get('q') if request.GET.get('q') != None else ''
-
+    print('This is q: ', q)
     rooms = Room.objects.filter(
         Q(topic__name__icontains=q) |
         Q(name__icontains=q) |

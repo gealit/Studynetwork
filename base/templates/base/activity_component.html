@@ -7,7 +7,7 @@
     <div class="activities__boxHeader roomListRoom__header">
       <a href="{% url 'user-profile' message.user.id %}" class="roomListRoom__author">
 
-        <div class="avatar avatar--small">
+        <div class="avatar avatar--small {% if message.user.is_online %}active{% endif %}">
           <img src="{{ message.user.avatar.url }}" />
         </div>
 
