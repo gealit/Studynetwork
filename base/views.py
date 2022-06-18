@@ -1,3 +1,4 @@
+from PIL import Image
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
@@ -56,7 +57,7 @@ def registerPage(request):
     return render(request, 'base/login_register.html', {'form': form})
 
 
-@login_required(login_url='login')
+@login_required(login_url='fake_home')
 def home(request):
     q = request.GET.get('q') if request.GET.get('q') != None else ''
     rooms = Room.objects.filter(
@@ -67,7 +68,7 @@ def home(request):
 
     topics = Topic.objects.all()[0:5]
     room_count = rooms.count()
-    room_messages = Message.objects.filter(Q(room__topic__name__icontains=q))
+    room_messages = Message.objects.filter(Q(room__topic__name__icontains=q))[0:5]
 
     context = {
         'rooms': rooms,
@@ -76,6 +77,10 @@ def home(request):
         'room_messages': room_messages,
     }
     return render(request, 'base/home.html', context)
+
+
+def fake_home(request):
+    return render(request, 'base/fake_home.html', {})
 
 
 @login_required(login_url='login')
@@ -189,9 +194,19 @@ def updateUser(request):
     form = UserForm(instance=user)
 
     if request.method == 'POST':
+
         form = UserForm(request.POST, request.FILES, instance=user)
         if form.is_valid():
             form.save()
+
+            image = Image.open(user.avatar.path)
+
+            if image.height > 200 or image.width > 200:
+                rgb_im = image.convert('RGB')
+                output_size = (200, 200)
+                rgb_im.thumbnail(output_size)
+                rgb_im.save(user.avatar.path)
+
             return redirect('user-profile', pk=user.id)
 
     context = {'form': form}
